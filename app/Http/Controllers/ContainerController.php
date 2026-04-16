@@ -52,6 +52,11 @@ class ContainerController extends Controller
         ],
     ];
 
+    public function index()
+    {
+        return response()->json($this->containers);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
