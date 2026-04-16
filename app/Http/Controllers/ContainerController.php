@@ -51,4 +51,23 @@ class ContainerController extends Controller
             'tracking_logs' => [],
         ],
     ];
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'container_id' => ['required', 'regex:/^[A-Z]{2}[0-9]{5}$/'],
+            'waste_type' => 'required',
+            'weight_kg' => 'required|numeric|min:10|max:5000'
+        ]);
+
+        if ($request->waste_type === strtolower("Chemical") && $request->weight_kg > 1000) {
+            return response()->json([
+                'errors' => ['weight_kg' => ['Chemical max 1000 kg']]
+            ], 422);
+        }
+
+        return response()->json([
+            "message" => "Created"
+        ], 201);
+    }
 }
