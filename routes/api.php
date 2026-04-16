@@ -14,3 +14,4 @@ Route::patch('/containers/{id}', [ContainerController::class, 'update']);
 Route::delete('/containers/{id}', [ContainerController::class, 'destroy']);
 
 Route::get('/containers/search', [ContainerController::class, 'search']);
+Route::get('/containers/{id}/logs', [ContainerController::class, 'logs']);

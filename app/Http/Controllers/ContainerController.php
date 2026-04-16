@@ -106,4 +106,16 @@ class ContainerController extends Controller
         return response()->json($filtered->values());
     }
 
+    public function logs($id)
+    {
+        foreach ($this->containers as $c) {
+            if ($c['container_id'] == $id) {
+                return response()->json($c['logs']);
+            }
+        }
+
+        return response()->json([
+            "message" => "Not Found"
+        ], 404);
+    }
 }
