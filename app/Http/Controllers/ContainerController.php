@@ -103,6 +103,12 @@ class ContainerController extends Controller
             return true;
         });
 
+        if ($filtered->count() == 0) {
+            return response()->json([
+                "message" => "Not Found"
+            ], 404);
+        }
+
         return response()->json($filtered->values());
     }
 
