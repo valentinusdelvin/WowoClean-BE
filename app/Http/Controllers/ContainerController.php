@@ -6,5 +6,49 @@ use Illuminate\Http\Request;
 
 class ContainerController extends Controller
 {
-    //
+    private static array $containers = [
+        [
+            'container_id' => 'AB12345',
+            'waste_type' => 'Chemical',
+            'weight_kg' => 450,
+            'status' => 'Active',
+            'tracking_logs' => [
+                ['location' => 'Gudang A - Jakarta', 'timestamp' => '2026-04-10 08:00:00', 'description' => 'Kontainer diterima di gudang utama.'],
+                ['location' => 'Transit Hub - Bekasi', 'timestamp' => '2026-04-11 14:30:00', 'description' => 'Dalam perjalanan ke fasilitas pengolahan.'],
+            ],
+        ],
+        [
+            'container_id' => 'CD67890',
+            'waste_type' => 'General',
+            'weight_kg' => 1200,
+            'status' => 'Active',
+            'tracking_logs' => [
+                ['location' => 'Laboratorium B - Surabaya', 'timestamp' => '2026-04-12 09:15:00', 'description' => 'Pengambilan sampel awal.'],
+            ],
+        ],
+        [
+            'container_id' => 'EF11111',
+            'waste_type' => 'General',
+            'weight_kg' => 780,
+            'status' => 'Archived',
+            'tracking_logs' => [],
+        ],
+        [
+            'container_id' => 'GH22222',
+            'waste_type' => 'General',
+            'weight_kg' => 3200,
+            'status' => 'Active',
+            'tracking_logs' => [
+                ['location' => 'Gudang C - Bandung', 'timestamp' => '2026-04-14 07:45:00', 'description' => 'Kontainer diisi dan disegel.'],
+                ['location' => 'Pelabuhan - Semarang', 'timestamp' => '2026-04-15 16:00:00', 'description' => 'Menunggu pengiriman laut.'],
+            ],
+        ],
+        [
+            'container_id' => 'IJ33333',
+            'waste_type' => 'Chemical',
+            'weight_kg' => 95,
+            'status' => 'Active',
+            'tracking_logs' => [],
+        ],
+    ];
 }
