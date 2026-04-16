@@ -70,4 +70,11 @@ class ContainerController extends Controller
             "message" => "Created"
         ], 201);
     }
+
+    public function update(Request $request, $id)
+    {
+        return response()->json([
+            "message" => "Updated to Archived"
+        ]);
+    }
 }

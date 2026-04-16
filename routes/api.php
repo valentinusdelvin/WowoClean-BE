@@ -9,3 +9,4 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::post('/containers', [ContainerController::class, 'store']);
+Route::patch('/containers/{id}', [ContainerController::class, 'update']);
