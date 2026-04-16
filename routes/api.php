@@ -10,3 +10,4 @@ Route::get('/user', function (Request $request) {
 
 Route::post('/containers', [ContainerController::class, 'store']);
 Route::patch('/containers/{id}', [ContainerController::class, 'update']);
+Route::delete('/containers/{id}', [ContainerController::class, 'destroy']);

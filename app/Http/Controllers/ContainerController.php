@@ -77,4 +77,12 @@ class ContainerController extends Controller
             "message" => "Updated to Archived"
         ]);
     }
+
+    public function destroy($id)
+    {
+        return response()->json([
+            "message" => "Deleted"
+        ]);
+    }
+
 }
