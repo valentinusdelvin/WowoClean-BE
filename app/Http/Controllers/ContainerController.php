@@ -65,7 +65,7 @@ class ContainerController extends Controller
             'weight_kg' => 'required|numeric|min:10|max:5000'
         ]);
 
-        if ($request->waste_type === strtolower("Chemical") && $request->weight_kg > 1000) {
+        if (strtolower($request->waste_type) === strtolower("chemical") && $request->weight_kg > 1000) {
             return response()->json([
                 'errors' => ['weight_kg' => ['Chemical max 1000 kg']]
             ], 422);
@@ -110,7 +110,7 @@ class ContainerController extends Controller
     {
         foreach ($this->containers as $c) {
             if ($c['container_id'] == $id) {
-                return response()->json($c['logs']);
+                return response()->json($c['tracking_logs']);
             }
         }
 
