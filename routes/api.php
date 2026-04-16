@@ -12,3 +12,5 @@ Route::get('/containers', [ContainerController::class, 'index']);
 Route::post('/containers', [ContainerController::class, 'store']);
 Route::patch('/containers/{id}', [ContainerController::class, 'update']);
 Route::delete('/containers/{id}', [ContainerController::class, 'destroy']);
+
+Route::get('/containers/search', [ContainerController::class, 'search']);

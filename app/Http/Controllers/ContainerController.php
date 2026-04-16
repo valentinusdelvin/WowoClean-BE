@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 class ContainerController extends Controller
 {
-    private static array $containers = [
+    private $containers = [
         [
             'container_id' => 'AB12345',
             'waste_type' => 'Chemical',
@@ -88,6 +88,22 @@ class ContainerController extends Controller
         return response()->json([
             "message" => "Deleted"
         ]);
+    }
+
+    public function search(Request $request)
+    {
+        $type = $request->query('type');
+        $min = $request->query('min_weight');
+
+        $filtered = collect($this->containers)->filter(function ($c) use ($type, $min) {
+            if ($type && $c['waste_type'] != $type)
+                return false;
+            if ($min && $c['weight_kg'] < $min)
+                return false;
+            return true;
+        });
+
+        return response()->json($filtered->values());
     }
 
 }
