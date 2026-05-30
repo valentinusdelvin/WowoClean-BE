@@ -1,0 +1,260 @@
+### =====================================================
+### WowoClean-BE API Gateway - HTTP Requests
+### =====================================================
+### Gunakan extension "REST Client" di VS Code untuk menjalankan request ini.
+### Install: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+###
+### Cara pakai: Klik "Send Request" di atas setiap request.
+### Setelah login, COPY token dari response dan PASTE ke @token di bawah.
+### =====================================================
+
+@baseUrl = http://127.0.0.1:8000/api/gateway
+
+### -----------------------------------------------
+### GANTI TOKEN DI BAWAH SETELAH LOGIN
+### -----------------------------------------------
+@token = eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0Iiwic3ViIjoxLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3ODAwNzg1NjMsImV4cCI6MTc4MDE2NDk2M30.GY5nMbG3ENtdBTPkQ3jX_rIEuaO-b3L76xQr8t3FFyQ
+
+
+### =====================================================
+### 1. AUTHENTICATION
+### =====================================================
+
+### 1a. Login sebagai Admin
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "admin@wowoclean.com",
+    "password": "password"
+}
+
+### 1b. Login sebagai Operator (User biasa)
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "operator@wowoclean.com",
+    "password": "password"
+}
+
+### 1c. Login dengan password salah (expect 401)
+POST {{baseUrl}}/login
+Content-Type: application/json
+Accept: application/json
+
+{
+    "email": "admin@wowoclean.com",
+    "password": "wrongpassword"
+}
+
+### 1d. Get Profile (butuh token)
+GET {{baseUrl}}/profile
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 1e. Logout (butuh token)
+POST {{baseUrl}}/logout
+Accept: application/json
+Authorization: Bearer {{token}}
+
+
+### =====================================================
+### 2. CONTAINERS - GET (admin & user bisa akses)
+### =====================================================
+
+### 2a. List semua containers
+GET {{baseUrl}}/containers
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 2b. Search containers by waste type
+GET {{baseUrl}}/containers/search?type=Chemical
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 2c. Search containers by minimum weight
+GET {{baseUrl}}/containers/search?min_weight=1000
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 2d. Search containers by type + min_weight
+GET {{baseUrl}}/containers/search?type=General&min_weight=1000
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 2e. Search yang tidak ada hasilnya (expect 404)
+GET {{baseUrl}}/containers/search?type=Radioactive
+Accept: application/json
+Authorization: Bearer {{token}}
+
+
+### =====================================================
+### 3. CONTAINERS - POST/PATCH/DELETE (hanya admin)
+### =====================================================
+
+### 3a. Buat container baru (admin only)
+POST {{baseUrl}}/containers
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "container_id": "KL44444",
+    "waste_type": "General",
+    "weight_kg": 500
+}
+
+### 3b. Buat container Chemical (admin only)
+POST {{baseUrl}}/containers
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "container_id": "MN55555",
+    "waste_type": "Chemical",
+    "weight_kg": 800
+}
+
+### 3c. Buat container Chemical > 1000kg (expect 422 - conditional validation)
+POST {{baseUrl}}/containers
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "container_id": "OP66666",
+    "waste_type": "Chemical",
+    "weight_kg": 1500
+}
+
+### 3d. Buat container dengan format ID salah (expect 422)
+POST {{baseUrl}}/containers
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "container_id": "invalid",
+    "waste_type": "General",
+    "weight_kg": 500
+}
+
+### 3e. Update container status ke Archived (admin only)
+PATCH {{baseUrl}}/containers/KL44444
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 3f. Delete container (admin only)
+DELETE {{baseUrl}}/containers/KL44444
+Accept: application/json
+Authorization: Bearer {{token}}
+
+
+### =====================================================
+### 4. TRACKING LOGS
+### =====================================================
+
+### 4a. Lihat tracking logs container AB12345 (admin & user)
+GET {{baseUrl}}/containers/AB12345/logs
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 4b. Lihat tracking logs container yang tidak ada (expect 404)
+GET {{baseUrl}}/containers/ZZ99999/logs
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 4c. Tambah tracking log baru ke container AB12345 (admin only)
+POST {{baseUrl}}/containers/AB12345/logs
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "location": "Fasilitas Pengolahan - Tangerang",
+    "timestamp": "2026-04-12 10:00:00",
+    "description": "Kontainer tiba di fasilitas pengolahan limbah."
+}
+
+### 4d. Tambah tracking log baru ke container CD67890 (admin only)
+POST {{baseUrl}}/containers/CD67890/logs
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "location": "Gudang Transit - Yogyakarta",
+    "timestamp": "2026-04-13 13:30:00",
+    "description": "Kontainer diterima untuk penyimpanan sementara."
+}
+
+### 4e. Tambah tracking log ke container yang tidak ada (expect 404)
+POST {{baseUrl}}/containers/ZZ99999/logs
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "location": "Gudang X",
+    "timestamp": "2026-04-15 08:00:00",
+    "description": "Test"
+}
+
+
+### =====================================================
+### 5. TEST AUTHORIZATION (Forbidden 403)
+### =====================================================
+### Gunakan token OPERATOR (login dulu sebagai operator, copy tokennya)
+###
+### 5a. Operator coba buat container (expect 403)
+POST {{baseUrl}}/containers
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "container_id": "XX99999",
+    "waste_type": "General",
+    "weight_kg": 200
+}
+
+### 5b. Operator coba update container (expect 403)
+PATCH {{baseUrl}}/containers/AB12345
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 5c. Operator coba delete container (expect 403)
+DELETE {{baseUrl}}/containers/AB12345
+Accept: application/json
+Authorization: Bearer {{token}}
+
+### 5d. Operator coba tambah tracking log (expect 403)
+POST {{baseUrl}}/containers/AB12345/logs
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{token}}
+
+{
+    "location": "Test Location",
+    "timestamp": "2026-04-20 10:00:00",
+    "description": "Test dari operator"
+}
+
+
+### =====================================================
+### 6. TEST TANPA TOKEN (Unauthorized 401)
+### =====================================================
+
+### 6a. Akses containers tanpa token (expect 401)
+GET {{baseUrl}}/containers
+Accept: application/json
+
+### 6b. Akses profile tanpa token (expect 401)
+GET {{baseUrl}}/profile
+Accept: application/json
