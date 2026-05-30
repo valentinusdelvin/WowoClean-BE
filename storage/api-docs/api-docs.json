@@ -1,0 +1,801 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "WowoClean API Documentation",
+        "description": "API dokumentasi untuk WowoClean",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/v1/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Login pengguna",
+                "description": "Autentikasi pengguna dengan email dan password, mengembalikan token JWT.",
+                "operationId": "loginUser",
+                "requestBody": {
+                    "description": "Kredensial login",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "admin@wowoclean.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Login berhasil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Login berhasil."
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Admin"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "admin@wowoclean.com"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "admin"
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "integer",
+                                            "example": 86400
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Email atau password salah",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthorized: Email atau password salah."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The email field is required."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/gateway/profile": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Ambil profil pengguna",
+                "description": "Mengembalikan data profil pengguna yang sedang login.",
+                "operationId": "getUserProfile",
+                "responses": {
+                    "200": {
+                        "description": "Profil berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "example": "Admin"
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "example": "admin@wowoclean.com"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "admin"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Token tidak valid atau tidak ada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/gateway/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout pengguna",
+                "description": "Invalidasi token JWT saat ini. Token akan di-blacklist.",
+                "operationId": "logoutUser",
+                "responses": {
+                    "200": {
+                        "description": "Logout berhasil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logout berhasil. Token telah di-invalidasi."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized - Token tidak valid atau tidak ada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/gateway/containers": {
+            "get": {
+                "tags": [
+                    "Containers"
+                ],
+                "summary": "Ambil semua kontainer",
+                "description": "Mengembalikan daftar semua kontainer beserta tracking log-nya.",
+                "operationId": "getContainers",
+                "responses": {
+                    "200": {
+                        "description": "Daftar kontainer berhasil diambil"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Containers"
+                ],
+                "summary": "Tambah kontainer baru",
+                "description": "Membuat kontainer baru. Hanya dapat diakses oleh admin. Limbah kimia (Chemical) maksimal 1000 kg.",
+                "operationId": "storeContainer",
+                "requestBody": {
+                    "description": "Data kontainer baru",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "container_id",
+                                    "waste_type",
+                                    "weight_kg"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Kontainer berhasil dibuat"
+                    },
+                    "401": {
+                        "description": "Unauthorized - Token tidak valid atau tidak ada"
+                    },
+                    "403": {
+                        "description": "Forbidden - Hanya admin yang dapat menambah kontainer"
+                    },
+                    "422": {
+                        "description": "Validation Error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/gateway/containers/{id}": {
+            "delete": {
+                "tags": [
+                    "Containers"
+                ],
+                "summary": "Hapus kontainer",
+                "description": "Menghapus kontainer berdasarkan container_id. Hanya dapat diakses oleh admin.",
+                "operationId": "deleteContainer",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Container ID (contoh: AB12345)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "AB12345"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Kontainer berhasil dihapus",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Deleted"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - Hanya admin"
+                    },
+                    "404": {
+                        "description": "Kontainer tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Not Found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Containers"
+                ],
+                "summary": "Arsipkan kontainer",
+                "description": "Mengubah status kontainer menjadi Archived. Hanya dapat diakses oleh admin.",
+                "operationId": "updateContainer",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Container ID (contoh: AB12345)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "AB12345"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Kontainer berhasil diarsipkan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Updated to Archived"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "container_id": {
+                                                    "type": "string",
+                                                    "example": "AB12345"
+                                                },
+                                                "waste_type": {
+                                                    "type": "string",
+                                                    "example": "Chemical"
+                                                },
+                                                "weight_kg": {
+                                                    "type": "number",
+                                                    "format": "float",
+                                                    "example": 500
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "Archived"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - Hanya admin"
+                    },
+                    "404": {
+                        "description": "Kontainer tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Not Found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/gateway/containers/search": {
+            "get": {
+                "tags": [
+                    "Containers"
+                ],
+                "summary": "Cari kontainer",
+                "description": "Filter kontainer berdasarkan jenis limbah dan/atau berat minimum.",
+                "operationId": "searchContainers",
+                "parameters": [
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "description": "Filter berdasarkan jenis limbah",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Chemical"
+                        }
+                    },
+                    {
+                        "name": "min_weight",
+                        "in": "query",
+                        "description": "Filter berat minimum (kg)",
+                        "required": false,
+                        "schema": {
+                            "type": "number",
+                            "format": "float",
+                            "example": 100
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Hasil pencarian kontainer",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "container_id": {
+                                                "type": "string",
+                                                "example": "AB12345"
+                                            },
+                                            "waste_type": {
+                                                "type": "string",
+                                                "example": "Chemical"
+                                            },
+                                            "weight_kg": {
+                                                "type": "number",
+                                                "format": "float",
+                                                "example": 500
+                                            },
+                                            "status": {
+                                                "type": "string",
+                                                "example": "Active"
+                                            },
+                                            "created_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "updated_at": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Tidak ada kontainer yang sesuai",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Not Found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/gateway/containers/{id}/logs": {
+            "get": {
+                "tags": [
+                    "Containers"
+                ],
+                "summary": "Ambil tracking log kontainer",
+                "description": "Mengembalikan daftar tracking log untuk kontainer tertentu.",
+                "operationId": "getContainerLogs",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Container ID (contoh: AB12345)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "AB12345"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tracking log berhasil diambil",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "container_id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "location": {
+                                                "type": "string",
+                                                "example": "Gudang A"
+                                            },
+                                            "timestamp": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "description": {
+                                                "type": "string",
+                                                "example": "Kontainer diterima di gudang"
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "404": {
+                        "description": "Kontainer tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Not Found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Containers"
+                ],
+                "summary": "Tambah tracking log kontainer",
+                "description": "Membuat tracking log baru untuk kontainer tertentu. Hanya dapat diakses oleh admin.",
+                "operationId": "storeContainerLog",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Container ID (contoh: AB12345)",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "example": "AB12345"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Data tracking log",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "location",
+                                    "timestamp",
+                                    "description"
+                                ],
+                                "properties": {
+                                    "location": {
+                                        "type": "string",
+                                        "example": "Gudang A"
+                                    },
+                                    "timestamp": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2026-05-30T10:00:00Z"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Kontainer diterima di gudang penyimpanan"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Tracking log berhasil dibuat",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Tracking log created"
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "container_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "location": {
+                                                    "type": "string",
+                                                    "example": "Gudang A"
+                                                },
+                                                "timestamp": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Kontainer diterima di gudang penyimpanan"
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden - Hanya admin"
+                    },
+                    "404": {
+                        "description": "Kontainer tidak ditemukan",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Not Found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Authentication"
+        },
+        {
+            "name": "Containers",
+            "description": "Containers"
+        }
+    ]
+}
